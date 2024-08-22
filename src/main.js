@@ -42,7 +42,7 @@ async function run() {
 
     let versionToBuild;
     if (calculatePrereleaseVersion) {
-      const branchName = core.getInput('branch-name', requiredArgOptions); // Leave this here so it can be "required"
+      const branchName = core.getInput('branch-name', requiredArgOptions); // Leave this here so it can be "required".
       core.info(`Calculating a pre-release version for ${branchName}...`);
 
       //This regex will strip out anything that's not a-z, 0-9 or the - character
