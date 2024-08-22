@@ -5244,7 +5244,7 @@ var calculatePrereleaseVersion = core.getBooleanInput('calculate-prerelease-vers
 var defaultReleaseType = core.getInput('default-release-type', requiredArgOptions).toLowerCase();
 var fallbackToNoPrefixSearch = core.getBooleanInput('fallback-to-no-prefix-search');
 var tagPrefix = core.getInput('tag-prefix');
-if (tagPrefix.toLowerCase() == 'none') {
+if (tagPrefix.toLowerCase() === 'none') {
   tagPrefix = '';
 }
 function setTheOutputs(name, value, tagPrefix2) {
@@ -5276,7 +5276,7 @@ async function run() {
         fallbackToNoPrefixSearch
       );
     } else {
-      core.info(`Calculating a release version...`);
+      core.info('Calculating a release version...');
       versionToBuild = nextReleaseVersion(defaultReleaseType, tagPrefix, fallbackToNoPrefixSearch);
     }
     console.log('version to build:');

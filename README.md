@@ -10,8 +10,6 @@ This template can be used to calculate a release or pre-release version.
   - [Incrementing Strategy](#incrementing-strategy)
   - [Inputs](#inputs)
   - [Outputs](#outputs)
-  - [Breaking Changes](#breaking-changes)
-    - [v2 to v3](#v2-to-v3)
   - [Usage Examples](#usage-examples)
   - [Contributing](#contributing)
     - [Incrementing the Version](#incrementing-the-version)
@@ -81,18 +79,6 @@ Each of the outputs are available as environment variables and as action outputs
 | `PRIOR_VERSION`                | The previous `major.minor.patch` version                        |
 | `PRIOR_VERSION_NO_PREFIX`      | The previous `major.minor.patch` version without the tag prefix |
 
-## Breaking Changes
-
-### v2 to v3
-
-- The `create-ref` input was removed
-  - This input has been deprecated for a while.  We recommend replacing this functionality with the `[Crediayni/create-release]` action.
-- The `github-token` input was removed
-  - This was only needed to create a ref on the repository so it is no longer needed.
-- The `NEXT_VERSION_SHA` output was removed
-  - Workflows can use the value that git-version-lite outputted directly.
-  - For `pull_request` workflow triggers the value was `github.event.pull_request.head.sha`.
-  - For all other workflow triggers the value was `github.sha`
 
 ## Usage Examples
 
@@ -114,7 +100,7 @@ jobs:
 
       - id: get-version
         # You may also reference just the major version.
-        uses: Crediayni/git-version-lite@v3.1.0
+        uses: Crediayni/git-version-lite@v1.1.0
         with:
           calculate-prerelease-version: true
           branch-name: ${{ github.head_ref }}       # github.head_ref works when the trigger is pull_request
