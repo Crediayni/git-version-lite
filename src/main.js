@@ -17,6 +17,7 @@ if (tagPrefix.toLowerCase() == 'none') {
   tagPrefix = ''; //action.yml sets it to v by default so the user wouldn't be able to set an empty string themselves.
 }
 
+
 function setTheOutputs(name, value, tagPrefix) {
   // Set the regular version (it has a tag prefix)
   const valueWithTag = `${tagPrefix}${value}`;
