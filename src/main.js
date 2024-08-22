@@ -1,65 +1,48 @@
 const core = require('@actions/core');
-const github = require('@actions/github');
 
 const { nextReleaseVersion, nextPrereleaseVersion } = require('./version');
 
-const calculatePrereleaseVersion = core.getInput('calculate-prerelease-version') === 'true';
-const branchName = core.getInput('branch-name');
-const defaultReleaseType = core.getInput('default-release-type').toLowerCase();
-const createRef = core.getInput('create-ref') === 'true';
-const fallbackToNoPrefixSearch = core.getInput('fallback-to-no-prefix-search') === 'true';
-const token = core.getInput('github-token');
+// When used, this requiredArgOptions will cause the action to error if a value has not been provided.
+const requiredArgOptions = {
+  required: true,
+  trimWhitespace: true
+};
+
+const calculatePrereleaseVersion = core.getBooleanInput('calculate-prerelease-version');
+const defaultReleaseType = core.getInput('default-release-type', requiredArgOptions).toLowerCase();
+const fallbackToNoPrefixSearch = core.getBooleanInput('fallback-to-no-prefix-search');
 let tagPrefix = core.getInput('tag-prefix');
 
-async function createRefOnGitHub(versionToBuild) {
-  core.info('Creating the ref on GitHub...');
-  if (!token || token.length === 0) {
-    core.setFailed('The token is required when creating a ref');
-    return;
-  }
-
-  const octokit = github.getOctokit(token);
-
-  let git_sha =
-    github.context.eventName === 'pull_request'
-      ? github.context.payload.pull_request.head.sha
-      : github.context.sha;
-
-  try {
-    await octokit.rest.git.createRef({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      ref: `refs/tags/${versionToBuild}`,
-      sha: git_sha
-    });
-    core.info('Finished creating the ref on GitHub.');
-  } catch (error) {
-    core.setFailed(`An error occurred creating the ref on GitHub: ${error}`);
-  }
+if (tagPrefix.toLowerCase() == 'none') {
+  tagPrefix = ''; //action.yml sets it to v by default so the user wouldn't be able to set an empty string themselves.
 }
+
+function setTheOutputs(name, value, tagPrefix) {
+  // Set the regular version (it has a tag prefix)
+  const valueWithTag = `${tagPrefix}${value}`;
+  core.setOutput(name, valueWithTag);
+  core.exportVariable(name, valueWithTag);
+  core.info(`${name}: ${valueWithTag}`);
+
+  // Set the version without the tag prefix
+  const noPrefixName = `${name}_NO_PREFIX`;
+  core.setOutput(noPrefixName, value);
+  core.exportVariable(noPrefixName, value);
+  core.info(`${noPrefixName}: ${value}`);
+}
+
 async function run() {
   try {
-    if (
-      defaultReleaseType !== 'major' &&
-      defaultReleaseType != 'minor' &&
-      defaultReleaseType != 'patch'
-    ) {
-      core.setFailed('The default release type must be populated and set to major|minor|patch');
-      return;
-    }
+    const expectedReleaseTypes = ['major', 'minor', 'patch'];
 
-    //action.yml sets it to v by default so the user wouldn't be able to set an empty string themselves.
-    if (tagPrefix.toLowerCase() == 'none') {
-      tagPrefix = '';
+    if (!expectedReleaseTypes.includes(defaultReleaseType)) {
+      core.setFailed('The default release type must be set to major|minor|patch');
+      return;
     }
 
     let versionToBuild;
     if (calculatePrereleaseVersion) {
-      if (!branchName || branchName.length === 0) {
-        core.setFailed('The branch name is required when calculating a pre-release version');
-        return;
-      }
-
+      const branchName = core.getInput('branch-name', requiredArgOptions); // Leave this here so it can be "required"
       core.info(`Calculating a pre-release version for ${branchName}...`);
 
       //This regex will strip out anything that's not a-z, 0-9 or the - character
@@ -75,15 +58,19 @@ async function run() {
       versionToBuild = nextReleaseVersion(defaultReleaseType, tagPrefix, fallbackToNoPrefixSearch);
     }
 
-    if (createRef) {
-      await createRefOnGitHub(versionToBuild);
-    }
+    console.log('version to build:');
+    console.log(versionToBuild);
 
-    core.setOutput('NEXT_VERSION', versionToBuild);
-    core.exportVariable('NEXT_VERSION', versionToBuild);
+    const { nextPatch, nextMinor, nextMajor, priorVersion } = versionToBuild;
+    setTheOutputs('PRIOR_VERSION', priorVersion, tagPrefix);
+    setTheOutputs('NEXT_VERSION', nextPatch, tagPrefix);
+    setTheOutputs('NEXT_MINOR_VERSION', nextMinor, tagPrefix);
+    setTheOutputs('NEXT_MAJOR_VERSION', nextMajor, tagPrefix);
   } catch (error) {
     const versionTxt = calculatePrereleaseVersion ? 'pre-release' : 'release';
-    core.setFailed(`An error occurred calculating the next ${versionTxt} version: ${error}`);
+    core.setFailed(
+      `An error occurred calculating the next ${versionTxt} version: ${error.message}`
+    );
   }
 }
 run();

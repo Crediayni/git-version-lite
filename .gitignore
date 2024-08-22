@@ -1,1 +1,4 @@
 node_modules/
+/.vscode/launch.json
+/pull-request.json
+/secrets.txt
