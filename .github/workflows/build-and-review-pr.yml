@@ -22,9 +22,9 @@ on:
   #   we can also use that to require all branches be up to date before they are merged.
 
 # -------------------------------------------------------------------------------------
-# NOTE: This repo duplicates the reusable build-and-review workflow in im-open/.github
+# NOTE: This repo duplicates the reusable build-and-review workflow in Crediayni/.github
 #       that the rest of the actions use.  If changes are needed in this workflow the
-#       same changes should be made in im-open/.github.  This workflow is duplicated
+#       same changes should be made in Crediayni/.github.  This workflow is duplicated
 #       so it can use a local copy of itself in the workflow.  This allows us to test
 #       the build pipeline with git-version-lite changes before we merge those changes.
 # -------------------------------------------------------------------------------------
@@ -393,7 +393,7 @@ jobs:
       NEXT_MAJOR_VERSION_NO_PREFIX: ''
 
       # Info for the repo we'll be testing git-version-lite against
-      TESTING_REPO: 'im-open/internal-repo-for-testing-purple-actions'
+      TESTING_REPO: 'Crediayni/internal-repo-for-testing-actions'
       TEST_BRANCH: 'my-test-branch'
 
       # These NEXT tags are set based on the fetch-depth not being set, so
@@ -595,7 +595,7 @@ jobs:
       NEXT_MAJOR_VERSION_NO_PREFIX: ''
 
       # Info for the repo we'll be testing git-version-lite against
-      TESTING_REPO: 'im-open/internal-repo-for-testing-purple-actions'
+      TESTING_REPO: 'Crediayni/internal-repo-for-testing-actions'
       TEST_BRANCH: 'my-test-branch'
 
       # All the remaining tags are for TESTING_REPO.  If anything changes tag-wise in that repo, these values need to be updated.
@@ -728,7 +728,7 @@ jobs:
         if: always()
         run: |
           git config user.name my-bot
-          git config user.email my-bot@im-open.com
+          git config user.email my-bot@crediayni.com
 
           git fetch
           git checkout -b ${{ env.TEST_BRANCH }}
