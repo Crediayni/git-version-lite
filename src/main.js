@@ -13,10 +13,9 @@ const defaultReleaseType = core.getInput('default-release-type', requiredArgOpti
 const fallbackToNoPrefixSearch = core.getBooleanInput('fallback-to-no-prefix-search');
 let tagPrefix = core.getInput('tag-prefix');
 
-if (tagPrefix.toLowerCase() == 'none') {
+if (tagPrefix.toLowerCase() === 'none') {
   tagPrefix = ''; //action.yml sets it to v by default so the user wouldn't be able to set an empty string themselves.
 }
-
 
 function setTheOutputs(name, value, tagPrefix) {
   // Set the regular version (it has a tag prefix)
@@ -55,7 +54,7 @@ async function run() {
         fallbackToNoPrefixSearch
       );
     } else {
-      core.info(`Calculating a release version...`);
+      core.info('Calculating a release version...');
       versionToBuild = nextReleaseVersion(defaultReleaseType, tagPrefix, fallbackToNoPrefixSearch);
     }
 
