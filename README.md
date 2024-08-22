@@ -100,7 +100,7 @@ jobs:
 
       - id: get-version
         # You may also reference just the major version.
-        uses: Crediayni/git-version-lite@v3.1.0
+        uses: Crediayni/git-version-lite@v1.1.0
         with:
           calculate-prerelease-version: true
           branch-name: ${{ github.head_ref }}       # github.head_ref works when the trigger is pull_request
